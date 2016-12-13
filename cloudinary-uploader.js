@@ -10,12 +10,10 @@ class CloudinaryUploader extends xin.Component {
 
       cloudName: {
         type: String,
-        required: true,
       },
 
       preset: {
         type: String,
-        required: true,
       },
 
       endpointUrl: {
@@ -30,17 +28,21 @@ class CloudinaryUploader extends xin.Component {
   }
 
   async upload (file) {
+    if (!this.cloudName || !this.preset) {
+      throw new Error('Cloud name and preset are mandatory');
+    }
+
     if (typeof file === 'string' && !file.startsWith('data:image')) {
       throw new Error('Cannot upload broken / non image file');
     }
 
-    let data = new FormData();
+    let data = new window.FormData();
     data.append('file', file);
     data.append('upload_preset', this.preset);
 
     let url = `${this.endpointUrl}/image/upload`;
 
-    let response = await fetch(url, {
+    let response = await window.fetch(url, {
       method: 'POST',
       body: data,
     });
