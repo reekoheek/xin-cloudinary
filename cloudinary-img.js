@@ -1,9 +1,9 @@
-import xin from 'xin';
+import { define, Component } from '@xinix/xin';
 
-class CloudinaryImg extends xin.Component {
+export class CloudinaryImg extends Component {
   get template () {
     return String(`
-      <img style="width: 100%; height: 100%" src="[[imgSrc]]">
+      <img style="width: 100%; height: 100%" src="[[imgSrc]]" hidden="[[imgSrc|not]]">
     `);
   }
 
@@ -11,15 +11,19 @@ class CloudinaryImg extends xin.Component {
     return Object.assign({}, super.props, {
       cloudName: {
         type: String,
+        value: '',
+        observer: '_observeSrc(cloudName, src)',
       },
 
       src: {
         type: String,
+        value: '',
+        observer: '_observeSrc(cloudName, src)',
       },
 
       imgSrc: {
         type: String,
-        computed: '_computeImgSrc(cloudName, src)',
+        value: '',
       },
 
       format: {
@@ -28,19 +32,26 @@ class CloudinaryImg extends xin.Component {
     });
   }
 
-  _computeImgSrc (cloudName, src) {
-    let format = '';
-    if (this.format) {
-      let fmt = Object.keys(this.format).map(i => `${i}_${this.format[i]}`).join(',');
-      if (fmt) {
-        format = fmt + '/';
+  _observeSrc (cloudName, src) {
+    let imgSrc = '';
+    if (cloudName && src) {
+      let format = '';
+      if (this.format) {
+        let fmt = Object.keys(this.format).map(i => `${i}_${this.format[i]}`).join(',');
+        if (fmt) {
+          format = fmt + '/';
+        }
       }
+      imgSrc = `http://res.cloudinary.com/${cloudName}/image/upload/${format}${src}`;
+
+      let image = new window.Image();
+      image.onload = () => this.set('imgSrc', imgSrc);
+      image.src = imgSrc;
+      return;
     }
-    let imgSrc = `http://res.cloudinary.com/${cloudName}/image/upload/${format}${src}`;
-    return imgSrc;
+
+    this.set('imgSrc', imgSrc);
   }
 }
 
-xin.define('cloudinary-img', CloudinaryImg);
-
-export default CloudinaryImg;
+define('cloudinary-img', CloudinaryImg);

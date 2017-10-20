@@ -1,6 +1,6 @@
-import xin from 'xin';
+import { define, Component } from '@xinix/xin';
 
-class CloudinaryUploader extends xin.Component {
+export class CloudinaryUploader extends Component {
   get props () {
     return Object.assign({}, super.props, {
       endpoint: {
@@ -51,6 +51,4 @@ class CloudinaryUploader extends xin.Component {
   }
 }
 
-xin.define('cloudinary-uploader', CloudinaryUploader);
-
-export default CloudinaryUploader;
+define('cloudinary-uploader', CloudinaryUploader);
